@@ -574,19 +574,53 @@ function TabCheckIn({ user }: { user: any }) {
             <p className="font-bold">ยังไม่มีการลงเวลาวันนี้</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-5">
             {todayRecords.map((r, i) => (
-              <div key={r._id || i} className="flex items-center justify-between p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/50 animate-fade-in-up">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-md">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" /></svg>
+              <div key={r._id || i} className="rounded-2xl border border-emerald-100 dark:border-emerald-800/50 overflow-hidden animate-fade-in-up shadow-sm">
+                {/* Record header row */}
+                <div className="flex items-center justify-between px-5 py-4 bg-emerald-50 dark:bg-emerald-900/20">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-md shrink-0">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" /></svg>
+                    </div>
+                    <div>
+                      <p className="font-extrabold text-emerald-700 dark:text-emerald-400 text-sm">{r.status || 'ปฏิบัติงาน'}</p>
+                      {r.lat && r.lat !== 0 && r.lng && r.lng !== 0 ? (
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1 mt-0.5">
+                          📍 {Number(r.lat).toFixed(5)}, {Number(r.lng).toFixed(5)}
+                        </p>
+                      ) : (
+                        <p className="text-[11px] text-slate-400 mt-0.5">📍 ไม่ได้รับพิกัด GPS</p>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-extrabold text-emerald-700 dark:text-emerald-400 text-sm">{r.status || 'ปฏิบัติงาน'}</p>
-                    {r.lat !== 0 && r.lng !== 0 && <p className="text-[10px] text-slate-400 font-mono">📍 {r.lat?.toFixed(4)}, {r.lng?.toFixed(4)}</p>}
+                  <div className="text-right shrink-0">
+                    <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 block leading-none">{r.time || '--:--'}</span>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">น.</span>
                   </div>
                 </div>
-                <span className="text-lg font-black text-emerald-600 dark:text-emerald-400">{r.time} น.</span>
+
+                {/* Map embed — show when GPS coords exist */}
+                {r.lat && r.lat !== 0 && r.lng && r.lng !== 0 && (
+                  <div className="relative">
+                    <iframe
+                      title={`map-${r._id || i}`}
+                      width="100%"
+                      height="220"
+                      style={{ border: 0, display: 'block' }}
+                      loading="lazy"
+                      src={`https://www.openstreetmap.org/export/embed.html?bbox=${Number(r.lng) - 0.005}%2C${Number(r.lat) - 0.005}%2C${Number(r.lng) + 0.005}%2C${Number(r.lat) + 0.005}&layer=mapnik&marker=${Number(r.lat)}%2C${Number(r.lng)}`}
+                    />
+                    <a
+                      href={`https://www.openstreetmap.org/?mlat=${r.lat}&mlon=${r.lng}#map=16/${r.lat}/${r.lng}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="absolute bottom-2 right-2 text-[10px] font-bold bg-white/90 text-blue-600 px-2.5 py-1 rounded-lg shadow border border-blue-100 hover:bg-blue-600 hover:text-white transition-colors"
+                    >
+                      เปิดใน OpenStreetMap ↗
+                    </a>
+                  </div>
+                )}
               </div>
             ))}
           </div>
